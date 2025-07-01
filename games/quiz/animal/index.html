@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz_Game_Animal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            /* font-size ถูกควบคุมโดย JavaScript */
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .game-frame {
+            position: relative; 
+            overflow: hidden;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            
+            width: 95vw;
+            height: calc(95vw * 1708 / 960);
+            
+            max-width: 672px;
+            max-height: 1195.6px;
+            
+            margin: auto;
+        }
+        @media (min-aspect-ratio: 960/1708) {
+            .game-frame {
+                height: 95vh;
+                width: calc(95vh * 960 / 1708);
+            }
+        }
+        
+        .game-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        .game-screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .answer-btn {
+            width: 58%; 
+            aspect-ratio: 530 / 128; 
+            border: 1px solid rgba(255, 255, 255, 0); 
+            padding: 0;
+            cursor: pointer;
+            transition: background-color 0.2s, visibility 0s;
+            z-index: 10;
+            
+            color: white;
+            font-family: 'Mali', sans-serif;
+            font-size: 10rem; 
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 30rem;
+            box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.2);
+        }
+
+        .answer-btn:nth-child(1) { background-color: #c23c33; }
+        .answer-btn:nth-child(2) { background-color: #fbab2f; }
+        .answer-btn:nth-child(3) { background-color: #349c9c; }
+
+        .answer-btn:hover {
+            opacity: 0.9;
+        }
+        .answer-btn.disabled {
+            background-color: rgba(150, 150, 150, 0.5);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .answer-btn.correct-feedback {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
+        .answer-btn.wrong-feedback {
+            background-color: #F44336 !important;
+            color: white !important;
+        }
+
+        .top-center-start-btn {
+            position: absolute;
+            top: 43%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25%; 
+            aspect-ratio: 1 / 1;
+            background-color: rgba(255, 0, 0, 0); 
+            border: 1px solid rgba(255, 255, 255, 0); 
+            cursor: pointer;
+            z-index: 10; 
+        }
+        .top-center-start-btn:hover {
+            background-color: rgba(255, 0, 0, 0); 
+        }
+
+        .back-to-main-btn {
+            position: absolute;
+            top: 3%; 
+            right: 3%; 
+            z-index: 20;
+            height: 5%;
+            width: 20%; 
+            aspect-ratio: 1 / 1; 
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background-color: rgba(0, 123, 255, 0.8);
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 12px; 
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+            font-size: 2.5rem;
+        }
+        .back-to-main-btn:hover {
+            background-color: rgba(0, 123, 255, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .custom-btn {
+            padding: 1.25rem 2.5rem; 
+            font-size: 1.5rem; 
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-out;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .custom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .custom-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #thank-you-screen #final-score {
+            position: absolute;
+            top: 25%; 
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            white-space: nowrap; 
+        }
+
+        .feedback-popup-overlay {
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .feedback-popup-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .feedback-popup {
+            background: #ffffff;
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.2);
+            width: 95%;
+            text-align: center;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .feedback-popup-overlay.visible .feedback-popup {
+            transform: scale(1);
+        }
+        .feedback-popup .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 5rem;
+            color: #e12f2f;
+        }
+        .feedback-popup h2 {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .feedback-popup p {
+            font-size: 5rem;
+            color: #666;
+        }
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .star {
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s, transform 0.2s;
+            font-size: 12rem;
+        }
+        .star:hover {
+            transform: scale(1.2);
+        }
+        .star.selected, .star.hovered {
+            color: #FFD700;
+        }
+        #feedback-text {
+            width: 100%; 
+            min-height: 8rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ddd;
+            background-color: rgba(255,255,255,0.5);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 5rem; /* ปรับขนาด font ใน textarea */
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        #submit-feedback-btn {
+            margin-top: 10rem;
+            margin-bottom: 10rem;
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 80%;
+            font-size: 5rem; /* ปรับขนาด font ปุ่มส่ง */
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #submit-feedback-btn:hover {
+            background-color: #45a049;
+        }
+        #submit-feedback-btn:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        #thank-you-screen .flex-col { 
+            position: absolute;
+            bottom: 30%; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%; 
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+        }
+
+        #play-again-btn {
+            width: 70%; 
+            aspect-ratio: 4 / 1; 
+            font-size: 5rem; 
+            padding: 0.8em 1.5em; 
+            background-color: #f0f0f0; 
+            color: #333; 
+            margin-top: 1rem; 
+        }
+
+        #quiz-screen .question-image {
+            width: 60%;
+            max-width: 400px;
+            height: auto;
+            margin-bottom: 70%;
+        }
+        
+        #quiz-screen .answer-buttons-wrap {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            gap: 13%;
+            height: 22%;
+        }
+
+        .wrong-answer-popup-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .wrong-answer-popup-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .wrong-answer-popup {
+            background-color: #F44336;
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 80%;
+            max-width: 350px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .wrong-answer-popup-overlay.visible .wrong-answer-popup {
+            transform: scale(1);
+        }
+        .wrong-answer-popup h2 {
+            font-size: 7rem;
+            font-weight: bold;
+            margin-top: 5rem;
+        }
+        .wrong-answer-popup p {
+            font-size: 5rem;
+            margin-bottom: 10rem;
+        }
+        .wrong-answer-popup button {
+            background-color: white;
+            color: #F44336;
+            padding: 0.8em 2em;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 5rem;
+            transition: background-color 0.2s;
+        }
+        .wrong-answer-popup button:hover {
+            background-color: #eee;
+        }
+        
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XQRWRKZ7RJ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XQRWRKZ7RJ');
+    </script>
+</head>
+<body>
+
+    <div class="game-frame">
+        
+        <div id="start-screen" class="game-screen active" style="background-image: url('./images/startpage.webp');">
+            <div id="loading-indicator" class="text-white text-2xl bg-black/50 p-4 rounded-lg z-20">
+                Loading...
+            </div>
+            <button id="real-start-btn" class="top-center-start-btn"></button> 
+            <button id="back-to-main-start-btn" class="back-to-main-btn">
+                &lt; Back to main
+            </button>
+        </div>
+
+        <div id="quiz-screen" class="game-screen" style="background-image: url('./images/bg_quiz.webp');"> 
+            </div>
+
+        <div id="thank-you-screen" class="game-screen text-white text-center p-10" style="background-image: url('./images/gameover.webp');">
+            <div id="final-score" class="text-5xl font-bold"></div> 
+            
+            <div class="flex flex-col items-center">
+                <button id="play-again-btn" class="custom-btn bg-white/80 backdrop-blur-sm hover:bg-white text-gray-800">
+                    play again
+                </button>
+            </div>
+            <button id="back-to-main-end-btn" class="back-to-main-btn">
+                &lt; Back to main
+            </button>
+        </div>
+
+        <div id="wrong-answer-popup-overlay" class="wrong-answer-popup-overlay">
+            <div class="wrong-answer-popup">
+                <h2>Oops! Wrong Answer</h2>
+                <p>Try again!</p>
+                <button id="wrong-popup-ok-btn">Got it!</button>
+            </div>
+        </div>
+
+        <div id="feedback-popup-overlay" class="feedback-popup-overlay">
+            <div class="feedback-popup">
+                <button id="close-popup-btn" class="close-btn">&times;</button>
+                <h2>Share your feedback for improvement.</h2>
+                <p>KruLunwalai Jaihwan</p>
+                <p>Creator</p>
+                <div class="star-rating">
+                    <span class="star" data-value="1">&#9733;</span>
+                    <span class="star" data-value="2">&#9733;</span>
+                    <span class="star" data-value="3">&#9733;</span>
+                </div>
+                <textarea id="feedback-text" placeholder="Type here..."></textarea>
+                <button id="submit-feedback-btn">✉️Send...✉️</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- START OF QUIZ CONFIGURATION ---
+        const QUIZ_TITLE = "Quiz_Game_Animal"; 
+
+        const IMAGE_QUIZ_MASTER = [
+            { image: 'ig01.webp', correctAnswer: 'Bird' },
+            { image: 'ig02.webp', correctAnswer: 'Dog' },
+            { image: 'ig03.webp', correctAnswer: 'Elephant' },
+            { image: 'ig04.webp', correctAnswer: 'Lion' },
+            { image: 'ig05.webp', correctAnswer: 'Giraffe' },
+            { image: 'ig06.webp', correctAnswer: 'Rabbit' },
+            { image: 'ig07.webp', correctAnswer: 'Tiger' },
+            { image: 'ig08.webp', correctAnswer: 'Penguin' },
+            { image: 'ig09.webp', correctAnswer: 'Monkey' },
+            { image: 'ig10.webp', correctAnswer: 'Zebra' },
+            { image: 'ig11.webp', correctAnswer: 'Panda' },
+            { image: 'ig12.webp', correctAnswer: 'Kangaroo' },
+            { image: 'ig13.webp', correctAnswer: 'Koala' },
+            { image: 'ig14.webp', correctAnswer: 'Bear' },
+            { image: 'ig15.webp', correctAnswer: 'Fox' },
+            { image: 'ig16.webp', correctAnswer: 'Deer' },
+            { image: 'ig17.webp', correctAnswer: 'Frog' },
+            { image: 'ig18.webp', correctAnswer: 'Snake' },
+            { image: 'ig19.webp', correctAnswer: 'Crocodile' },
+            { image: 'ig20.webp', correctAnswer: 'Hippo' },
+            { image: 'ig21.webp', correctAnswer: 'Rhino' },
+            { image: 'ig22.webp', correctAnswer: 'Owl' },
+            { image: 'ig23.webp', correctAnswer: 'Camel' },
+            { image: 'ig24.webp', correctAnswer: 'Duck' },
+            { image: 'ig25.webp', correctAnswer: 'Worm' },
+            { image: 'ig26.webp', correctAnswer: 'Bee' },
+            { image: 'ig27.webp', correctAnswer: 'Ant' },
+            { image: 'ig28.webp', correctAnswer: 'Spider' },
+            { image: 'ig29.webp', correctAnswer: 'Bat' },
+            { image: 'ig30.webp', correctAnswer: 'Mouse' },
+            { image: 'ig31.webp', correctAnswer: 'Cow' },
+            { image: 'ig32.webp', correctAnswer: 'Goat' },
+            { image: 'ig33.webp', correctAnswer: 'Sheep' },
+            { image: 'ig34.webp', correctAnswer: 'Pig' },
+            { image: 'ig35.webp', correctAnswer: 'Chicken' },
+            { image: 'ig36.webp', correctAnswer: 'Horse' },
+            { image: 'ig37.webp', correctAnswer: 'Donkey' },
+            { image: 'ig38.webp', correctAnswer: 'Cat' },
+            { image: 'ig39.webp', correctAnswer: 'Seals' },
+            { image: 'ig40.webp', correctAnswer: 'Crab' },
+        ];
+
+        const ANSWER_POOL = [
+            "Bird","Dog","Elephant","Lion","Giraffe","Rabbit","Tiger","Penguin","Monkey","Zebra",
+            "Panda","Kangaroo","Koala","Bear","Fox","Deer","Frog","Snake","Crocodile","Hippo",
+            "Rhino","Owl","Camel","Duck","Worm","Bee","Ant","Spider","Bat","Mouse",
+            "Cow","Goat","Sheep","Pig","Chicken","Horse","Donkey","Cat","Seals","Crab",
+            "Dolphin","Peacock","Swan","Whale","Shark","Fish","Octopus","Butterfly","Dragonfly","Turtle",
+            "Bug","Mosquito","Fly","Beetle","Moth","Chameleon","Parrot","Eagle","Hawk","Goose",
+            "Crow","Boar","Unicorn","Eel","Snail","Badger","Gecko","Gorilla","Lizard","Ferret"
+        ];
+
+        const NUM_QUESTIONS_TO_ASK = 20;
+        const NUM_ANSWER_CHOICES = 3;
+
+        let currentQuizSet = [];
+        let currentQuestionIndex = 0; 
+        let playerScore = 0; 
+
+        // --- END OF QUIZ CONFIGURATION ---
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_lmku8r8oaXmDf5zyu3jJddiQap-TPCoEWtEVZBvPzoMuOAAYVIBUtDMHXee6m6GEzA/exec"; 
+
+        function getOrSetDeviceId() {
+            let deviceId = localStorage.getItem('quizGameDeviceId'); 
+            if (!deviceId) { 
+                deviceId = 'device-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11); 
+                localStorage.setItem('quizGameDeviceId', deviceId); 
+            }
+            return deviceId; 
+        }
+
+        async function submitScore(score) {
+            const payload = {
+                sheetName: 'Scores', 
+                deviceId: getOrSetDeviceId(), 
+                score: score, 
+                titleQuiz: QUIZ_TITLE 
+            };
+            try {
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    cache: 'no-cache', 
+                    headers: { 'Content-Type': 'application/json', }, 
+                    body: JSON.stringify(payload), 
+                    redirect: 'follow' 
+                });
+                console.log('Score submission request sent.'); 
+            } catch (e) {
+                console.error('Error submitting score:', e); 
+            }
+        }
+        
+        function submitFeedback(rating, feedbackText) {
+            const payload = {
+                sheetName: 'Feedback', 
+                deviceId: getOrSetDeviceId(), 
+                rating: rating, 
+                feedbackText: feedbackText, 
+                titleQuiz: QUIZ_TITLE 
+            };
+            fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                cache: 'no-cache', 
+                headers: { 'Content-Type': 'application/json', }, 
+                body: JSON.stringify(payload), 
+                redirect: 'follow' 
+            }).then(() => {
+                console.log('Feedback submission request sent.'); 
+            }).catch(e => {
+                console.error('Error submitting feedback:', e); 
+            });
+        }
+
+        const screens = document.querySelectorAll('.game-screen'); 
+        const realStartBtn = document.getElementById('real-start-btn'); 
+        const playAgainBtn = document.getElementById('play-again-btn'); 
+        const quizScreenEl = document.getElementById('quiz-screen'); 
+        const loadingIndicator = document.getElementById('loading-indicator'); 
+        const finalScoreEl = document.getElementById('final-score'); 
+        
+        const backToMainStartBtn = document.getElementById('back-to-main-start-btn');
+        const backToMainEndBtn = document.getElementById('back-to-main-end-btn');
+
+        const wrongAnswerPopupOverlay = document.getElementById('wrong-answer-popup-overlay');
+        const wrongPopupOkBtn = document.getElementById('wrong-popup-ok-btn');
+        
+        let backgroundMusic;
+        let correctSound;
+        let wrongSound;
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generateQuizSet() {
+            const shuffledMaster = shuffleArray([...IMAGE_QUIZ_MASTER]);
+            currentQuizSet = shuffledMaster.slice(0, NUM_QUESTIONS_TO_ASK);
+
+            currentQuizSet = currentQuizSet.map(q => {
+                const correctAnswer = q.correctAnswer;
+                let incorrectAnswers = [];
+
+                const filteredAnswerPool = ANSWER_POOL.filter(answer => answer !== correctAnswer);
+                const shuffledWrongAnswers = shuffleArray([...filteredAnswerPool]);
+                
+                if (shuffledWrongAnswers.length >= (NUM_ANSWER_CHOICES - 1)) {
+                    incorrectAnswers = shuffledWrongAnswers.slice(0, NUM_ANSWER_CHOICES - 1);
+                } else {
+                    console.warn("Not enough unique incorrect answers in the pool!");
+                    while (incorrectAnswers.length < (NUM_ANSWER_CHOICES - 1) && shuffledWrongAnswers.length > 0) {
+                        incorrectAnswers.push(shuffledWrongAnswers.pop());
+                    }
+                }
+                
+                const allChoices = shuffleArray([correctAnswer, ...incorrectAnswers]);
+
+                return {
+                    image: `./images/${q.image}`,
+                    correctAnswer: correctAnswer,
+                    choices: allChoices
+                };
+            });
+        }
+
+        function showScreen(screenId) {
+            screens.forEach(screen => {
+                screen.classList.remove('active'); 
+            });
+            document.getElementById(screenId).classList.add('active'); 
+        }
+
+        function loadQuestion(questionIndex) {
+            const question = currentQuizSet[questionIndex]; 
+            quizScreenEl.innerHTML = ''; 
+
+            const questionImg = document.createElement('img');
+            questionImg.src = question.image;
+            questionImg.className = 'question-image';
+            quizScreenEl.appendChild(questionImg);
+            
+            const answerButtonsContainer = document.createElement('div'); 
+            answerButtonsContainer.className = 'answer-buttons-wrap'; 
+
+            question.choices.forEach((choiceText, index) => { 
+                const button = document.createElement('button'); 
+                button.className = 'answer-btn'; 
+                button.textContent = choiceText; 
+                button.addEventListener('click', () => selectAnswer(choiceText, button)); 
+                answerButtonsContainer.appendChild(button); 
+            });
+            quizScreenEl.appendChild(answerButtonsContainer); 
+        }
+
+        function selectAnswer(selectedChoiceText, clickedButton) {
+            const currentQuestion = currentQuizSet[currentQuestionIndex];
+            
+            const allAnswerButtons = quizScreenEl.querySelectorAll('.answer-btn');
+            allAnswerButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('disabled');
+            });
+
+            if (selectedChoiceText === currentQuestion.correctAnswer) {
+                if (correctSound) { 
+                    correctSound.currentTime = 0; 
+                    correctSound.play(); 
+                }
+                playerScore++;
+                
+                clickedButton.classList.remove('disabled');
+                clickedButton.classList.add('correct-feedback');
+
+                setTimeout(() => {
+                    currentQuestionIndex++; 
+                    if (currentQuestionIndex < currentQuizSet.length) { 
+                        loadQuestion(currentQuestionIndex); 
+                    } else {
+                        const finalDisplayScore = Math.max(0, playerScore);
+                        finalScoreEl.innerText = `${finalDisplayScore} / ${NUM_QUESTIONS_TO_ASK}`; 
+
+                        showScreen('thank-you-screen'); 
+                        
+                        playAgainBtn.disabled = false; 
+                        playAgainBtn.style.cursor = 'pointer'; 
+
+                        submitScore(playerScore);
+                        setTimeout(() => document.getElementById('feedback-popup-overlay').classList.add('visible'), 300); 
+                    }
+                }, 700);
+            } else {
+                if (wrongSound) { 
+                    wrongSound.currentTime = 0; 
+                    wrongSound.play(); 
+                }
+                
+                playerScore--; 
+                
+                clickedButton.classList.remove('disabled');
+                clickedButton.classList.add('wrong-feedback');
+
+                wrongAnswerPopupOverlay.classList.add('visible'); 
+            }
+        }
+        
+        realStartBtn.addEventListener('click', () => {
+            backgroundMusic = new Audio('./audio/gametheme.ogg');
+            backgroundMusic.loop = true; 
+            correctSound = new Audio('./audio/correct.ogg'); 
+            wrongSound = new Audio('./audio/wrong.ogg');   
+
+            backgroundMusic.play().catch(e => console.log("Background music autoplay prevented:", e)); 
+
+            currentQuestionIndex = 0; 
+            playerScore = 0; 
+            generateQuizSet(); 
+            loadQuestion(currentQuestionIndex); 
+            showScreen('quiz-screen'); 
+        });
+
+        if (backToMainStartBtn) {
+            backToMainStartBtn.addEventListener('click', () => {
+                window.location.href = '../../../index.html'; 
+            });
+        }
+
+        // --- START: FULLY CORRECTED CODE for Wrong Answer Popup Button ---
+        wrongPopupOkBtn.addEventListener('click', () => {
+            const wrongButton = quizScreenEl.querySelector('.answer-btn.wrong-feedback');
+            if (wrongButton) {
+                wrongButton.style.visibility = 'hidden';
+                // This next line is CRITICAL to fix the bug.
+                wrongButton.classList.remove('wrong-feedback'); 
+            }
+
+            const allAnswerButtons = quizScreenEl.querySelectorAll('.answer-btn');
+            allAnswerButtons.forEach(btn => {
+                btn.classList.remove('disabled');
+                btn.disabled = false;
+            });
+
+            wrongAnswerPopupOverlay.classList.remove('visible');
+        });
+        // --- END: CORRECTED CODE ---
+
+        playAgainBtn.addEventListener('click', () => {
+            if (backgroundMusic) {
+                backgroundMusic.pause(); 
+                backgroundMusic.currentTime = 0; 
+            }
+            showScreen('start-screen'); 
+        });
+
+        if (backToMainEndBtn) {
+            backToMainEndBtn.addEventListener('click', () => {
+                if (backgroundMusic) {
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0;
+                }
+                window.location.href = '../../../index.html'; 
+            });
+        }
+
+        const feedbackOverlay = document.getElementById('feedback-popup-overlay'); 
+        const closePopupBtn = document.getElementById('close-popup-btn'); 
+        const submitFeedbackBtn = document.getElementById('submit-feedback-btn'); 
+        const stars = document.querySelectorAll('.star-rating .star'); 
+
+        let currentRating = 0; 
+
+        function hidePopup() {
+            feedbackOverlay.classList.remove('visible'); 
+        }
+
+        closePopupBtn.addEventListener('click', hidePopup); 
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                currentRating = parseInt(star.dataset.value); 
+                stars.forEach(s => {
+                    s.classList.remove('selected'); 
+                    if (parseInt(s.dataset.value) <= currentRating) {
+                        s.classList.add('selected'); 
+                    }
+                });
+            });
+
+            star.addEventListener('mouseover', () => {
+                const hoverValue = parseInt(star.dataset.value); 
+                stars.forEach(s => {
+                    s.classList.remove('hovered'); 
+                    if (parseInt(s.dataset.value) <= hoverValue) {
+                        s.classList.add('hovered'); 
+                    }
+                });
+            });
+
+            star.addEventListener('mouseout', () => {
+                stars.forEach(s => s.classList.remove('hovered')); 
+            });
+        });
+
+        submitFeedbackBtn.addEventListener('click', () => {
+            if (currentRating === 0) {
+                alert('⭐⭐Please ⭐give rate⭐ before sending...⭐⭐'); 
+                return;
+            }
+            const feedbackText = document.getElementById('feedback-text').value; 
+            submitFeedbackBtn.disabled = true; 
+            submitFeedbackBtn.innerText = '⏳Sending...⏳'; 
+
+            submitFeedback(currentRating, feedbackText);
+            
+            submitFeedbackBtn.innerText = '🙏Complete🙏';
+            
+            setTimeout(() => {
+                hidePopup(); 
+                submitFeedbackBtn.disabled = false; 
+                submitFeedbackBtn.innerText = '✉️Send...✉️'; 
+                currentRating = 0; 
+                stars.forEach(s => s.classList.remove('selected')); 
+                document.getElementById('feedback-text').value = ''; 
+            }, 2000);
+        });
+
+        function smartPreload() {
+            const startImageUrl = './images/startpage.webp'; 
+            const startImg = new Image(); 
+            
+            startImg.onload = () => {
+                loadingIndicator.style.display = 'none'; 
+            };
+
+            startImg.src = startImageUrl; 
+        }
+
+        function adjustGameScaling() {
+            const gameFrame = document.querySelector('.game-frame');
+            if (!gameFrame) return;
+
+            const designWidth = 960;
+            const currentWidth = gameFrame.offsetWidth;
+            
+            const scaleRatio = currentWidth / designWidth;
+            const rootFontSize = 10 * scaleRatio;
+
+            document.documentElement.style.fontSize = `${rootFontSize}px`;
+        }
+
+        window.addEventListener('load', () => {
+            smartPreload();
+            adjustGameScaling();
+        });
+
+        window.addEventListener('resize', adjustGameScaling);
+
+    </script>
+</body>
+</html>
