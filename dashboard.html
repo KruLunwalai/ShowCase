@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ผู้ดูแล - คลังเกมควิซ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f2f5; /* Light background for dashboard */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .auth-section {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .auth-section h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .auth-section input[type="password"] {
+            width: 80%;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+            transition: border-color 0.2s;
+        }
+        .auth-section input[type="password"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        .auth-section button {
+            background-color: #007bff;
+            color: white;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        .auth-section button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+        .dashboard-content {
+            display: none; /* Hidden by default */
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .dashboard-content h1 {
+            font-size: 2.2rem;
+            color: #28a745; /* Green for success/dashboard title */
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .dashboard-content p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 0.8rem;
+        }
+        .dashboard-content ul {
+            list-style: disc;
+            margin-left: 20px;
+            color: #555;
+        }
+        .dashboard-content li {
+            margin-bottom: 5px;
+        }
+        .dashboard-content a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .dashboard-content a:hover {
+            text-decoration: underline;
+        }
+        .error-message {
+            color: #dc3545; /* Red for error */
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="authSection" class="auth-section">
+            <h2>เข้าสู่ระบบ Dashboard</h2>
+            <input type="password" id="passwordInput" placeholder="กรอกรหัสผ่าน">
+            <button id="loginButton">เข้าสู่ระบบ</button>
+            <p id="errorMessage" class="error-message">รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง</p>
+        </div>
+
+        <div id="dashboardContent" class="dashboard-content">
+            <h1>ยินดีต้อนรับสู่ Dashboard ผู้ดูแล!</h1>
+            <p>หน้านี้มีไว้สำหรับครูลัญช์วลัยเพื่อดูข้อมูลสำคัญเกี่ยวกับเกมควิซ</p>
+            
+            <h2 class="text-xl font-bold text-gray-800 mb-2 mt-4">ข้อมูลสรุป:</h2>
+            <ul>
+                <li>จำนวนเกมทั้งหมด: 1 (สามารถอัปเดตเองได้)</li>
+                <li>คะแนนเฉลี่ยจากเกม "สัตว์น่ารู้": (ข้อมูลจาก Google Sheet)</li>
+                <li>ข้อเสนอแนะล่าสุด: (ข้อมูลจาก Google Sheet)</li>
+            </ul>
+
+            <h2 class="text-xl font-bold text-gray-800 mb-2 mt-4">ลิงก์ด่วน:</h2>
+            <ul>
+                <li><a href="https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID_HERE/edit" target="_blank">ดูข้อมูลคะแนนและข้อเสนอแนะ (Google Sheet)</a></li>
+                <li><a href="index.html">กลับหน้าหลักเกม</a></li>
+            </ul>
+
+            <p class="text-sm text-red-500 mt-4">**ข้อควรระวัง: ระบบรหัสผ่านนี้ทำงานฝั่งเบราว์เซอร์เท่านั้น ไม่ปลอดภัยสำหรับข้อมูลสำคัญสูงสุด**</p>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "your_secret_password"; // ★★★ แก้ไขรหัสผ่านของคุณตรงนี้ ★★★
+        const passwordInput = document.getElementById('passwordInput');
+        const loginButton = document.getElementById('loginButton');
+        const authSection = document.getElementById('authSection');
+        const dashboardContent = document.getElementById('dashboardContent');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginButton.addEventListener('click', () => {
+            if (passwordInput.value === correctPassword) {
+                authSection.style.display = 'none';
+                dashboardContent.style.display = 'block';
+                errorMessage.style.display = 'none';
+            } else {
+                errorMessage.style.display = 'block';
+                passwordInput.value = ''; // Clear password field
+            }
+        });
+
+        // Optional: Allow pressing Enter key to log in
+        passwordInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                loginButton.click();
+            }
+        });
+    </script>
+</body>
+</html>

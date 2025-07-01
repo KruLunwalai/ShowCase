@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KruLunwalai Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Leckerli One:wght@400;700&display=swap" rel="stylesheet"> 
+    <link rel="icon" href="favicon.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: #328ef0;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.05rem solid #eee;
+            box-shadow: 0 0.125rem 0.625rem rgba(0,0,0,0.05);
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(0,0,0,0.1);
+            font-family: 'Leckerli One', cursive; /* เพิ่มบรรทัดนี้ */
+        }
+        
+        /* --- การปรับปรุงสำหรับ MAIN CONTENT AREA (ผืนผ้า) --- */
+        main {
+            flex-grow: 1;
+            width: 98%;
+            max-width: 1080px; 
+            margin: 0 auto;
+            padding: 3rem 0;
+        }
+        /* --- สิ้นสุดการปรับปรุงสำหรับ MAIN CONTENT AREA --- */
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 1rem; 
+        }
+
+        @media (min-width: 640px) { 
+            .game-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 960px) { 
+            .game-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .category-section {
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+        .category-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #484848;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .game-card {
+            background-color: #57a1f0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 0.375rem 1.25rem rgba(255, 255, 255, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border: 0.1875rem solid #e0e0e0;
+        }
+        .game-card:hover {
+            transform: translateY(-0.5rem);
+            box-shadow: 0 0.625rem 1.875rem rgba(0,0,0,0.15);
+        }
+        .game-card img {
+            width: 100%;
+            height: 70%; 
+            object-fit: cover;
+            border-bottom: 0.0625rem solid #f0f0f0;
+        }
+        .game-card-content {
+            padding: 0.3rem;
+            text-align: center;
+        }
+        .game-card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: #ffffff;
+        }
+        .game-card-description {
+            font-size: 1rem;
+            color: #272727;
+            line-height: 2;
+            margin-bottom: 4rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #ffffff;
+            border-top: 0.0625rem solid #eee;
+            margin-top: auto;
+            font-size: 1rem;
+            background-color: #328ef0;
+        }
+        .dashboard-link {
+            font-size: 1rem;
+            color: #007bff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 0.0625rem solid #007bff;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        .dashboard-link:hover {
+            background-color: #007bff;
+            color: white;
+            box-shadow: 0 0.125rem 0.5rem rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-title">KruLunwalai Showcase</div>
+        <nav>
+            <a href="dashboard.html" class="dashboard-link" aria-label="ไปที่หน้า Dashboard ผู้ดูแล">Dashboard</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="category-section">
+            <h2 class="category-title">Quiz Game</h2>
+            <div class="game-grid">
+                <a href="./games/quiz/animal/index.html" class="game-card" aria-label="เปิดเกมตอบคำถาม สัตว์น่ารู้">
+                    <img src="./covers/G-Q-animal.png" alt="เกมตอบคำถาม สัตว์น่ารู้">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">สัตว์น่ารู้</h3>
+                        <p class="game-card-description">นี่..ตัวอะไร ตอบกันได้ไหม?</p>
+                    </div>
+                </a>
+
+                <a href="./games/quiz/vegetableAfruit/index.html" class="game-card" aria-label="เปิดเกมตอบคำถาม ผักและผลไม้">
+                    <img src="./covers/G-Q-vegAf-01.png" alt="เกมตอบคำถาม ผักและผลไม้">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">ผักและผลไม้</h3>
+                        <p class="game-card-description">รู้จักผักและผลไม้มากแค่ไหน?</p>
+                    </div>
+                </a>
+
+                <a href="./games/quiz/tools/index.html" class="game-card" aria-label="เปิดเกมตอบคำถาม อุปกรณ์">
+                    <img src="./covers/quiz_tools_cover.png" alt="เกมตอบคำถาม อุปกรณ์">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">อุปกรณ์</h3>
+                        <p class="game-card-description">ทายชื่ออุปกรณ์ในชีวิตประจำวันรอบตัวเรา</p>
+                    </div>
+                
+                </a>
+            </div>
+        </section>
+
+        <section class="category-section">
+            <h2 class="category-title">เกมการ์ด</h2>
+            <div class="game-grid">
+                <a href="./games/card/animal/index.html" class="game-card" aria-label="เปิดเกมการ์ด สัตว์น่ารู้">
+                    <img src="./covers/G-C-animal.png" alt="เกมการ์ด สัตว์น่ารู้">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">สัตว์น่ารู้</h3>
+                        <p class="game-card-description">จับคู่การ์ด ฝึกคำศัพท์และความจำ</p>
+                    </div>
+                </a>
+
+                <a href="./games/card/fruit/index.html" class="game-card" aria-label="เปิดเกมการ์ด ผักและผลไม้">
+                    <img src="./covers/card_fruit_cover.png" alt="เกมการ์ด ผักและผลไม้">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">ผักและผลไม้</h3>
+                        <p class="game-card-description">จับคู่การ์ดผักและผลไม้สีสันสดใส</p>
+                    </div>
+                </a>
+
+                <a href="./games/card/tools/index.html" class="game-card" aria-label="เปิดเกมการ์ด อุปกรณ์">
+                    <img src="./covers/card_tools_cover.png" alt="เกมการ์ด อุปกรณ์">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">อุปกรณ์</h3>
+                        <p class="game-card-description">หาการ์ดอุปกรณ์ที่เข้าคู่กัน</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-section">
+            <h2 class="category-title">เกมหาตัวอักษรที่หายไป</h2>
+            <div class="game-grid">
+                <a href="./games/missing_letter/animal/index.html" class="game-card" aria-label="เปิดเกมหาตัวอักษรที่หายไป สัตว์น่ารู้">
+                    <img src="./covers/G-M-animal.png" alt="เกมหาตัวอักษร สัตว์น่ารู้">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">สัตว์น่ารู้</h3>
+                        <p class="game-card-description">เติมตัวอักษรที่หายไปให้ถูกต้อง</p>
+                    </div>
+                </a>
+                </div>
+        </section>
+
+        <section class="category-section">
+            <h2 class="category-title">หมวดหมู่พิเศษ</h2>
+            <div class="game-grid">
+                <a href="./games/special/homework_check/index.html" class="game-card" aria-label="เปิดระบบเช็คการบ้าน">
+                    <img src="./covers/special_homework_cover.png" alt="เช็คการบ้าน">
+                    <div class="game-card-content">
+                        <h3 class="game-card-title">เช็คการบ้าน</h3>
+                        <p class="game-card-description">ระบบตรวจสอบการส่งการบ้าน</p>
+                    </div>
+                </a>
+
+                <a href="./games/special/class_time/index.html" class="game-card" aria-label="เปิดระบบเช็คเวลาเรียนเด็ก">
+                    <img src="./covers/special_class_time_cover.png" alt="เช็คเวลาเรียนเด็ก">
+                    <div class="game-card-content">
+                        <h3 class="class-card-title">เช็คเวลาเรียนเด็ก</h3>
+                        <p class="game-card-description">ดูตารางและเวลาเรียนของนักเรียน</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 สร้างสรรค์โดย ครูลัญช์วลัย ใจหวาน</p>
+        <p>กลุ่มสาระการเรียนรู้ภาษาต่างประเทศ โรงเรียนวัดเทพลีลา สำนักงานเขตบางกะปิ กรุงเทพมหานคร</p>
+        <p>"ถ้ารูปแบบการเรียนรู้ยังเหมือนเดิม... นักเรียน จะเติบโตได้อย่างไร ในโลกที่เปลี่ยนไปทุกวัน"</p>
+    </footer>
+
+</body>
+</html>
