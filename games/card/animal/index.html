@@ -160,7 +160,7 @@
             <div class="card-grid-container card-grid-top" id="image-cards"></div>
             <div class="card-grid-container card-grid-bottom" id="text-cards"></div>
         </div>
-        <div id="thank-you-screen" class="game-screen text-white text-center p-10" style="background-image: url('./images/GameOver.webp');">
+        <div id="thank-you-screen" class="game-screen text-white text-center p-10" style="background-image: url('./images/gameOver.webp');">
             <div id="final-score" class="text-5xl font-bold"></div> 
             <div class="flex flex-col items-center">
                  <button id="play-again-btn" class="custom-btn bg-white/80 backdrop-blur-sm hover:bg-white text-gray-800">
@@ -376,7 +376,9 @@
                     correctSound.play();
                 }
                 card1.classList.add('matched');
+                void card1.offsetHeight;
                 card2.classList.add('matched');
+                void card2.offsetHeight;
                 matchedPairs++;
                 if (matchedPairs === NUM_PAIRS_TO_PLAY) {
                     stopTimer();
