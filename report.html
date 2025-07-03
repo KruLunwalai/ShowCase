@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบตรวจสอบการบ้าน ป.2/1</title>
+  
+  <!-- Google Fonts: IBM Plex Sans Thai -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* --- General Styles & Variables --- */
+    :root {
+      --primary-color: #4a90e2;
+      --background-color: #f4f7f6;
+      --card-background: #ffffff;
+      --text-color: #333;
+      --gray-text: #777;
+      --green-check: #28a745;
+      --red-cross: #dc3545;
+      --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    body {
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* --- Header --- */
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      color: var(--primary-color);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    /* --- Loading & Error Indicator --- */
+    #loader {
+      text-align: center;
+      font-size: 1.2em;
+      padding: 50px;
+      color: var(--gray-text);
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0,0,0,0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* --- Student Grid --- */
+    #student-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* --- Student Card --- */
+    .student-card {
+      background-color: var(--card-background);
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .student-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--card-hover-shadow);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .student-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #e0e0e0;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s;
+    }
+    
+    .student-photo:active {
+      transform: scale(1.15);
+      border-color: var(--primary-color);
+    }
+
+    .student-info h3 {
+      margin: 0;
+      font-size: 1.4em;
+      font-weight: 500;
+    }
+
+    .student-info p {
+      margin: 5px 0 0;
+      color: var(--gray-text);
+      font-size: 1em;
+    }
+    
+    hr {
+      border: none;
+      height: 1px;
+      background-color: #e0e0e0;
+      margin: 15px 0;
+    }
+
+    .card-section h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+      color: var(--primary-color);
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 5px;
+    }
+
+    /* --- Homework Status --- */
+    .homework-status {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    
+    .homework-status li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 0.95em;
+    }
+    
+    .homework-status li:not(:last-child) {
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .status-icon {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    .completed { color: var(--green-check); }
+    .pending { color: var(--red-cross); }
+
+    /* --- Attendance Summary --- */
+    .attendance-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 15px;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    .attendance-item {
+      background-color: #f9f9f9;
+      padding: 5px 8px;
+      border-radius: 8px;
+    }
+    .attendance-item span {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    /* --- Footer --- */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .home-button {
+      display: inline-block;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 1.1em;
+      font-weight: 500;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .home-button:hover {
+      background-color: #3a7bc8;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ระบบตรวจสอบการบ้านและเวลาเรียน</h1>
+    <p style="color: #555; font-size: 1.2em; margin-top: 5px;">นักเรียนชั้น ป.2/1</p>
+  </header>
+
+  <main>
+    <div id="loader">
+      <div class="spinner"></div>
+      <p>กำลังโหลดข้อมูลนักเรียน...</p>
+    </div>
+    <div id="student-grid" style="display: none;"></div>
+  </main>
+
+  <footer>
+    <!-- คุณสามารถเปลี่ยนลิงก์นี้ให้เป็นหน้าหลักในโปรเจกต์ Git ของคุณ -->
+    <a href="./index.html" class="home-button">กลับหน้าหลัก</a>
+  </footer>
+
+  <script>
+    // --- START: ส่วนที่ต้องแก้ไข ---
+    // ใส่ URL ของ Web App ที่ได้จากการ Deploy ใน Apps Script ตรงนี้
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyTqNImrKQ1uJ-htSjACtbU6clDdwkbXIGygfd_6haZbXNDaB01PrEDr5gnEbLXsc42/exec';
+    // --- END: ส่วนที่ต้องแก้ไข ---
+
+
+    /**
+     * ฟังก์ชันสำหรับสร้างการ์ดนักเรียนและแสดงผลบนหน้าเว็บ
+     * @param {Array} studentsData - ข้อมูลนักเรียนที่ได้จาก API
+     */
+    function displayStudents(studentsData) {
+      const grid = document.getElementById('student-grid');
+      const loader = document.getElementById('loader');
+
+      // ตรวจสอบว่ามี error หรือไม่
+      if (studentsData.error) {
+        loader.innerHTML = `<p style="color:red;">เกิดข้อผิดพลาด: ${studentsData.error}</p>`;
+        return;
+      }
+      
+      // ถ้าไม่มีข้อมูล
+      if (!studentsData || studentsData.length === 0) {
+        loader.innerHTML = `<p>ไม่พบข้อมูลนักเรียนใน Google Sheet</p>`;
+        return;
+      }
+
+      let cardsHTML = '';
+      studentsData.forEach(student => {
+        // สร้างรายการสถานะการบ้าน (Homework)
+        let homeworkHTML = student.homework.map(hw => {
+          const statusClass = hw.submitted ? 'completed' : 'pending';
+          const statusIcon = hw.submitted ? '✓' : '✗';
+          return `<li>${hw.name} <span class="status-icon ${statusClass}">${statusIcon}</span></li>`;
+        }).join('');
+
+        if (homeworkHTML === '') {
+          homeworkHTML = '<li>ยังไม่มีรายการการบ้าน</li>';
+        }
+
+        // สร้าง HTML ของการ์ดนักเรียนแต่ละคน
+        cardsHTML += `
+          <div class="student-card">
+            <div class="card-header">
+              <img src="${student.imageUrl}" alt="รูปนักเรียน" class="student-photo" onerror="this.onerror=null;this.src='https://placehold.co/100x100/EFEFEF/AAAAAA?text=รูปภาพ';">
+              <div class="student-info">
+                <h3>${student.name}</h3>
+                <p>เลขที่ ${student.id}</p>
+              </div>
+            </div>
+            
+            <div class="card-section">
+              <h4>สถานะการบ้าน</h4>
+              <ul class="homework-status">${homeworkHTML}</ul>
+            </div>
+
+            <hr>
+
+            <div class="card-section">
+              <h4>สรุปเวลาเรียน</h4>
+              <div class="attendance-summary">
+                <div class="attendance-item">ขาด: <span>${student.attendance.absent}</span> วัน</div>
+                <div class="attendance-item">ลา: <span>${student.attendance.leave}</span> วัน</div>
+                <div class="attendance-item">ป่วย: <span>${student.attendance.sick}</span> วัน</div>
+                <div class="attendance-item">สาย: <span>${student.attendance.late}</span> ครั้ง</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = cardsHTML;
+      loader.style.display = 'none';
+      grid.style.display = 'grid';
+    }
+
+    // Event Listener ที่จะทำงานเมื่อหน้าเว็บโหลดเสร็จสมบูรณ์
+    document.addEventListener('DOMContentLoaded', () => {
+      // ตรวจสอบว่าผู้ใช้ได้ใส่ URL หรือยัง
+      if (WEB_APP_URL.includes('YOUR_DEPLOYMENT_ID')) {
+        document.getElementById('loader').innerHTML = `<p style="color:orange; font-weight:bold;">กรุณาใส่ Web App URL ในไฟล์ report.html ก่อน</p>`;
+        return;
+      }
+      
+      // ใช้ Fetch API เพื่อดึงข้อมูลจาก Google Apps Script
+      fetch(WEB_APP_URL)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          displayStudents(data); 
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+          document.getElementById('loader').innerHTML = `<p style="color:red;">ไม่สามารถโหลดข้อมูลได้ อาจเกิดจากปัญหา CORS หรือ URL ไม่ถูกต้อง</p>`;
+        });
+    });
+  </script>
+</body>
+</html>

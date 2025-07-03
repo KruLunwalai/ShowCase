@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตารางกิจกรรม</title>
+    <style>
+        /* --- 🎨 ส่วนของ CSS สำหรับตกแต่งหน้าเว็บ --- */
+
+        /* ตั้งค่าพื้นฐานสำหรับทั้งหน้า */
+        body {
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* รูปภาพตารางเวลา (ก่อนคลิก) */
+        .schedule-image {
+            max-width: 80%;
+            max-height: 70vh;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            cursor: pointer; /* เปลี่ยนเมาส์เป็นรูปมือเมื่อชี้ */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* เพิ่มอนิเมชั่นตอนเอาเมาส์ชี้ */
+        }
+
+        /* ลูกเล่นเมื่อเอาเมาส์ชี้ที่รูป */
+        .schedule-image:hover {
+            transform: scale(1.05) rotate(1deg); /* ขยายและเอียงเล็กน้อย */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ปุ่มกลับหน้าหลัก */
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- 🖼️ ส่วนของ Popup --- */
+
+        /* พื้นหลังสีดำโปร่งแสงของ Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: none; /* ซ่อนไว้ก่อน */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease; /* อนิเมชั่นตอนแสดง/ซ่อน */
+        }
+
+        /* ทำให้ Popup แสดงผลเมื่อมี class 'show' */
+        .popup-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* รูปภาพที่แสดงใน Popup */
+        .popup-content {
+            max-width: 90%;
+            max-height: 90%;
+            transform: scale(0.7); /* เริ่มจากขนาดเล็ก */
+            transition: transform 0.3s ease; /* อนิเมชั่นตอนขยาย */
+        }
+        
+        /* ทำให้รูปภาพขยายเต็มขนาดเมื่อ Popup แสดง */
+        .popup-overlay.show .popup-content {
+            transform: scale(1);
+        }
+
+        /* ปุ่มปิด (กากบาท) */
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <img src="./covers/schedule.webp" alt="ตารางกิจกรรม" id="scheduleImage" class="schedule-image">
+
+    <a href="index.html" class="back-button">กลับหน้าหลัก</a>
+
+    <div id="imagePopup" class="popup-overlay">
+        <span id="closeBtn" class="close-button">&times;</span>
+        <img class="popup-content" id="popupImage">
+    </div>
+
+    <script>
+        // --- ⚙️ ส่วนของ JavaScript สำหรับควบคุมการทำงาน ---
+
+        // 1. หา Element ที่เราต้องการใช้งาน
+        const scheduleImage = document.getElementById('scheduleImage');
+        const imagePopup = document.getElementById('imagePopup');
+        const popupImage = document.getElementById('popupImage');
+        const closeBtn = document.getElementById('closeBtn');
+
+        // 2. เมื่อคลิกที่รูปภาพตารางเวลา
+        scheduleImage.addEventListener('click', function() {
+            //_กำหนดให้รูปใน Popup เป็นรูปเดียวกับที่คลิก
+            popupImage.src = this.src; 
+            //_แสดง Popup ขึ้นมาโดยการเพิ่ม class 'show'
+            imagePopup.classList.add('show'); 
+        });
+
+        // 3. ฟังก์ชันสำหรับปิด Popup
+        function closePopup() {
+            imagePopup.classList.remove('show');
+        }
+
+        // 4. กำหนดให้ปุ่มกากบาท (closeBtn) และพื้นหลังสีดำ (imagePopup) สามารถปิด Popup ได้
+        closeBtn.addEventListener('click', closePopup);
+        imagePopup.addEventListener('click', function(event) {
+            // เช็คว่าที่คลิกคือพื้นหลัง ไม่ใช่ตัวรูปภาพ
+            if (event.target === imagePopup) {
+                closePopup();
+            }
+        });
+
+    </script>
+
+</body>
+</html>
