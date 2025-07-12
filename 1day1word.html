@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โครงการ 1 วัน 1 คำ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            color: var(--text-color);
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            padding: 30px 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            font-weight: 700;
+            font-size: 1.2em;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        #english-word {
+            font-size: 3.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        #thai-word {
+            font-size: 1.8em;
+            color: var(--secondary-color);
+            margin-top: -10px;
+            margin-bottom: 30px;
+        }
+
+        .example {
+            background-color: var(--background-color);
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .example p {
+            margin: 10px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .example p strong {
+            color: var(--secondary-color);
+        }
+
+        #word-info {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .back-button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>โครงการ 1 วัน 1 คำ 🗓️</h2>
+        
+        <div id="loading-state">
+            <div class="loader"></div>
+            <p>กำลังโหลดคำศัพท์สำหรับวันนี้...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <h1 id="english-word"></h1>
+            <p id="thai-word"></p>
+            
+            <div class="example">
+                <p><strong>EN:</strong> <span id="english-example"></span></p>
+                <p><strong>TH:</strong> <span id="thai-example"></span></p>
+            </div>
+
+            <p id="word-info"></p>
+        </div>
+
+    </div>
+
+    <a href="index.html" class="back-button">🏠 กลับหน้าหลัก</a>
+
+    <script>
+        // URL ของไฟล์ CSV จาก Google Sheet ของคุณ (ใส่ให้เรียบร้อยแล้ว)
+        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTgJ1G6RWWQJGHRR8CDGJ39azsAkuiCXNSqJGLJbOZqYdSCiFk9fE5lMVDurox8INTR9xS5b4RSta2D/pub?gid=0&single=true&output=csv';
+
+        async function fetchWordOfTheDay() {
+            const loadingDiv = document.getElementById('loading-state');
+            const contentDiv = document.getElementById('content');
+            
+            try {
+                const response = await fetch(GOOGLE_SHEET_URL);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                const csvText = await response.text();
+                
+                const rows = csvText.split('\n').slice(1);
+                const words = rows.map(row => {
+                    // Split by comma, but handle cases where commas are inside quotes (not implemented in this simple parser)
+                    return row.split(',');
+                }).filter(row => row.length >= 5 && row[1] && row[1].trim() !== '');
+
+                if (words.length === 0) {
+                    throw new Error("ไม่พบข้อมูลคำศัพท์ใน Google Sheet หรือไฟล์ CSV อาจจะว่างเปล่า");
+                }
+
+                const now = new Date();
+                const start = new Date(now.getFullYear(), 0, 0);
+                const diff = now - start;
+                const oneDay = 1000 * 60 * 60 * 24;
+                const dayOfYear = Math.floor(diff / oneDay);
+
+                const wordIndex = (dayOfYear - 1) % words.length;
+                const selectedWord = words[wordIndex];
+                
+                document.getElementById('english-word').textContent = selectedWord[1].trim();
+                document.getElementById('thai-word').textContent = selectedWord[2].trim();
+                document.getElementById('english-example').textContent = selectedWord[3].trim();
+                document.getElementById('thai-example').textContent = selectedWord[4].trim();
+                document.getElementById('word-info').textContent = `คำที่ ${wordIndex + 1} จากทั้งหมด ${words.length} คำ`;
+                
+                loadingDiv.style.display = 'none';
+                contentDiv.style.display = 'block';
+
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error);
+                const contentDiv = document.getElementById('content');
+                contentDiv.style.display = 'block';
+                document.getElementById('english-word').textContent = "เกิดข้อผิดพลาด";
+                document.getElementById('thai-word').textContent = "ไม่สามารถโหลดข้อมูลได้: " + error.message;
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchWordOfTheDay);
+    </script>
+
+</body>
+</html>
